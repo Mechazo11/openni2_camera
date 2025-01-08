@@ -15,6 +15,7 @@ Branching:
    - The [ros2](https://github.com/ros-drivers/openni2_camera/tree/ros2) branch supports Jazzy and later
    - The [iron](https://github.com/ros-drivers/openni2_camera/tree/iron) branch supports Humble to Iron
    - openni2_launch has NOT been ported yet
+   - The ros2-fix contains a patch in openni2_driver.cpp
 
 ## Developer document
    - [docs.ros.org/openni2_launch](http://docs.ros.org/en/melodic/api/openni2_launch/html/)
