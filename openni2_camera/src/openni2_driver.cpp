@@ -155,48 +155,65 @@ void OpenNI2Driver::advertiseROSTopics()
   std::lock_guard<std::mutex> lock(connect_mutex_);
 
   // Asus Xtion PRO does not have an RGB camera
+  // 01/05/2024 ROS 2 Humble does not have a .matched_callback attribute for rclcpp::PublisherEventCallbacks
+  // if (device_->hasColorSensor())
+  // {
+  //   // Create publisher with connect callback
+  //   rclcpp::PublisherOptions pub_options;
+  //   pub_options.event_callbacks.matched_callback =
+  //     [this](rclcpp::MatchedStatus&)
+  //     {
+  //       colorConnectCb();
+  //     };
+  //   rmw_qos_profile_t custom_qos = rmw_qos_profile_default;
+  //   custom_qos.depth = 1;
+  //   pub_color_ = image_transport::create_camera_publisher(this, "rgb/image_raw", custom_qos, pub_options);
+  // }
+
+  // Asus Xtion PRO does not have an RGB camera
   if (device_->hasColorSensor())
   {
-    // Create publisher with connect callback
-    rclcpp::PublisherOptions pub_options;
-    pub_options.event_callbacks.matched_callback =
-      [this](rclcpp::MatchedInfo&)
-      {
-        colorConnectCb();
-      };
-    rmw_qos_profile_t custom_qos = rmw_qos_profile_default;
-    custom_qos.depth = 1;
-    pub_color_ = image_transport::create_camera_publisher(this, "rgb/image_raw", custom_qos, pub_options);
+      // Adjust QoS profile
+      rmw_qos_profile_t custom_qos = rmw_qos_profile_default;
+      custom_qos.depth = 1;
+
+      // Create publisher without pub_options
+      pub_color_ = image_transport::create_camera_publisher(this, "rgb/image_raw", custom_qos);
+
+      // Call colorConnectCb() if needed
+      colorConnectCb();
   }
+
 
   if (device_->hasIRSensor())
   {
-    // Create publisher with connect callback
-    rclcpp::PublisherOptions pub_options;
-    pub_options.event_callbacks.matched_callback =
-      [this](rclcpp::MatchedInfo&)
-      {
-        irConnectCb();
-      };
-    rmw_qos_profile_t custom_qos = rmw_qos_profile_default;
-    custom_qos.depth = 1;
-    pub_ir_ = image_transport::create_camera_publisher(this, "ir/image_raw", custom_qos, pub_options);
+      // Adjust QoS profile
+      rmw_qos_profile_t custom_qos = rmw_qos_profile_default;
+      custom_qos.depth = 1;
+
+      // Create publisher without pub_options
+      pub_ir_ = image_transport::create_camera_publisher(this, "ir/image_raw", custom_qos);
+
+      // Call irConnectCb() if needed
+      irConnectCb();
   }
+
 
   if (device_->hasDepthSensor())
   {
-    // Create publisher with connect callback
-    rclcpp::PublisherOptions pub_options;
-    pub_options.event_callbacks.matched_callback =
-      [this](rclcpp::MatchedInfo&)
-      {
-        depthConnectCb();
-      };
-    rmw_qos_profile_t custom_qos = rmw_qos_profile_default;
-    custom_qos.depth = 1;
-    pub_depth_raw_ = image_transport::create_camera_publisher(this, "depth_raw/image", custom_qos, pub_options);
-    pub_depth_ = image_transport::create_camera_publisher(this, "depth/image", custom_qos, pub_options);
-    pub_projector_info_ = this->create_publisher<sensor_msgs::msg::CameraInfo>("projector/camera_info", 1);
+      // Adjust QoS profile
+      rmw_qos_profile_t custom_qos = rmw_qos_profile_default;
+      custom_qos.depth = 1;
+
+      // Create publishers without pub_options
+      pub_depth_raw_ = image_transport::create_camera_publisher(this, "depth_raw/image", custom_qos);
+      pub_depth_ = image_transport::create_camera_publisher(this, "depth/image", custom_qos);
+
+      // Create projector info publisher
+      pub_projector_info_ = this->create_publisher<sensor_msgs::msg::CameraInfo>("projector/camera_info", 1);
+
+      // Call depthConnectCb() if needed
+      depthConnectCb();
   }
 
   ////////// CAMERA INFO MANAGER
